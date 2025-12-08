@@ -1,52 +1,66 @@
 // server/utils/emails.js
-import sgMail from '@sendgrid/mail';
+import { Resend } from 'resend';
 
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-if (!SENDGRID_API_KEY) {
-  console.warn('SendGrid API key not set. Email sending will fail.');
-} else {
-  sgMail.setApiKey(SENDGRID_API_KEY);
+const resendApiKey = process.env.RESEND_API_KEY;
+if (!resendApiKey) {
+  console.warn('⚠️ RESEND_API_KEY is not set. Emails will fail.');
 }
+const resend = new Resend(resendApiKey);
 
 /**
- * sendBookingEmail via SendGrid
- * @param {Object} user - user doc
- * @param {Object} booking - booking doc
- * @param {Object} show - show doc (should include movie.title and showDateTime)
+ * sendBookingEmail via Resend
+ * @param {Object} user - user document { email, name }
+ * @param {Object} booking - booking document { bookedSeats: [], amount, _id }
+ * @param {Object} show - show document { showDateTime, movie: { title } }
  */
 export const sendBookingEmail = async (user, booking, show) => {
-  if (!SENDGRID_API_KEY) {
-    throw new Error('SENDGRID_API_KEY not configured');
+  if (!resendApiKey) {
+    throw new Error('RESEND_API_KEY not configured');
+  }
+  if (!user?.email) {
+    throw new Error('No recipient email provided');
   }
 
-  const seatList = Array.isArray(booking.bookedSeats) ? booking.bookedSeats.join(', ') : booking.bookedSeats;
+  const seatList = Array.isArray(booking.bookedSeats) ? booking.bookedSeats.join(', ') : booking.bookedSeats || '';
   const dateTime = show?.showDateTime
     ? new Date(show.showDateTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
     : '';
 
-  const subject = `Your booking is confirmed – ${show?.movie?.title || 'Movie'}`;
+  const subject = `🎬 Booking Confirmed – ${show?.movie?.title || 'Your Movie'}`;
   const html = `
-    <h2>Booking Confirmed ✅</h2>
-    <p>Hi ${user.name || ''},</p>
-    <p>Your ticket has been booked successfully.</p>
-    <ul>
-      <li><strong>Movie:</strong> ${show?.movie?.title || ''}</li>
-      <li><strong>Date & Time:</strong> ${dateTime}</li>
-      <li><strong>Seats:</strong> ${seatList}</li>
-      <li><strong>Amount Paid:</strong> ₹${booking.amount}</li>
-    </ul>
-    <p>Enjoy your show! 🍿</p>
+    <div style="font-family: Arial, sans-serif; line-height:1.5;">
+      <h2>Booking Confirmed ✅</h2>
+      <p>Hi ${user.name || ''},</p>
+      <p>Your ticket has been booked successfully. Details below:</p>
+      <ul>
+        <li><strong>Movie:</strong> ${show?.movie?.title || ''}</li>
+        <li><strong>Date & Time:</strong> ${dateTime}</li>
+        <li><strong>Seats:</strong> ${seatList}</li>
+        <li><strong>Amount Paid:</strong> ₹${booking.amount}</li>
+      </ul>
+      <p>Booking ID: ${booking._id}</p>
+      <p>Enjoy the show! 🍿</p>
+    </div>
   `;
 
-  const msg = {
-    to: user.email,
-    from: process.env.SENDGRID_FROM || process.env.SMTP_USER, // verified sender
-    subject,
-    html,
-  };
-
-  console.log('📧 Sending email via SendGrid to:', user.email);
-  const result = await sgMail.send(msg);
-  console.log('✅ SendGrid response:', result && result[0] && result[0].statusCode);
-  return result;
+  // Simple retry helper (2 attempts total)
+  const maxAttempts = 2;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      console.log(`📧 Resend: sending attempt ${attempt} to ${user.email}`);
+      const res = await resend.emails.send({
+        from: process.env.RESEND_FROM || process.env.SEND_FROM || 'no-reply@yourdomain.com',
+        to: user.email,
+        subject,
+        html,
+      });
+      console.log('✅ Resend send result:', res);
+      return res;
+    } catch (err) {
+      console.error(`❌ Resend send error (attempt ${attempt}):`, err?.message || err);
+      if (attempt === maxAttempts) throw err;
+      // small delay before retry (simple backoff)
+      await new Promise((r) => setTimeout(r, 800 * attempt));
+    }
+  }
 };
