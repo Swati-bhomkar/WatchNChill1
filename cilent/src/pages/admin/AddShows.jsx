@@ -197,7 +197,7 @@ const AddShows = () => {
           onClick={handleAddShowClick}
           className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90"
         >
-          Add Show
+          Add Movie
         </button>
       </div>
 

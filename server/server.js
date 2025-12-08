@@ -29,11 +29,11 @@ app.get('/api/stripe/test', (req, res) => {
 //Stripe webhooks route
 app.post('/api/stripe',express.raw({type : 'application/json'}),stripeWebhooks)
 // // This MUST come before bodyParser.json for that route
-app.post(
-  '/api/booking/webhook',
-  express.raw({ type: 'application/json' }),
-  stripeWebhooks
-)
+// app.post(
+//   '/api/booking/webhook',
+//   express.raw({ type: 'application/json' }),
+//   stripeWebhooks
+// )
 
 app.use(express.json());
 app.use(cors());
