@@ -20,8 +20,11 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "fs": "^0.0.1-security",
     "mongoose": "^8.18.2",
+    "multer": "^2.0.2",
     "nodemailer": "^7.0.10",
+    "path": "^0.12.7",
     "resend": "^6.5.2",
     "stripe": "^20.0.0"
   },

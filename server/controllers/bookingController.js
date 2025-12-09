@@ -75,15 +75,16 @@ export const createBooking = async (req , res) => {
     ]
 
     const session = await stripe.checkout.sessions.create({
-  success_url: `${origin}/loading/my-bookings?session_id={CHECKOUT_SESSION_ID}`,
-  cancel_url: `${origin}/my-bookings`,
-  line_items,
-  mode: 'payment',
-  metadata: {
-    bookingId: booking._id.toString()
-  },
-  expires_at: Math.floor(Date.now() / 1000) + 30 * 60 // 30 minutes from now
-})
+     success_url: `${origin}/my-bookings`,
+     cancel_url: `${origin}/my-bookings`,
+     line_items,
+     mode: 'payment',
+     metadata: {
+     bookingId: booking._id.toString()
+     },
+     expires_at: Math.floor(Date.now() / 1000) + 30 * 60
+    })
+
 
     // store payment link/sessionId if you want
     booking.paymentSessionId = session.id

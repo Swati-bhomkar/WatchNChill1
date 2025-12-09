@@ -1,5 +1,4 @@
 // App.jsx
-import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import Navbar from './components/Navbar';
@@ -24,14 +23,14 @@ import ListShows from './pages/admin/ListShows';
 import ListBookings from './pages/admin/ListBookings';
 import AddShowForm from './pages/admin/AddShowForm';
 import AdminRoute from "./components/admin/AdminRoute";
-
+import Profile from './pages/profile';
 
 const App = () => {
   const location = useLocation();
   const path = location.pathname;
 
   // Hide Navbar and Footer for login and all admin routes
-  const hideNavFooter = path === '/login' || path.startsWith('/admin');
+  const hideNavFooter = path === '/login' || path === '/profile' || path.startsWith('/admin');
 
   return (
     <>
@@ -47,6 +46,8 @@ const App = () => {
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/favorite" element={<Favorite />} />
         <Route path="/login" element={<Login />} />
+        <Route path='/profile' element={<Profile />} />
+        
 
         {/* Admin routes — nested under /admin */}
         <Route path="/admin" element={

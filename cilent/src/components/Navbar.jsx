@@ -11,6 +11,14 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = React.useState(false);
   const navigate = useNavigate();
 
+  const getProfileImage = () => {
+    if (user?.image && user.image !== 'default.jpg') {
+      // base64 or URL from Mongo
+      return user.image;
+    }
+    return assets.profiles; // frontend default
+  };
+
   return (
     <div className="fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-3">
       <Link to="/" className="max-md:flex-1">
@@ -31,7 +39,14 @@ const Navbar = () => {
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/">Home</Link>
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/movies">Movies</Link>
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/theaters">Theaters</Link>
-        {user && <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/favorite">Favorites</Link>}
+        {user && (
+          <Link
+            onClick={() => { scrollTo(0, 0); setIsOpen(false); }}
+            to="/favorite"
+          >
+            Favorites
+          </Link>
+        )}
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to="/About">About</Link>
       </div>
 
@@ -44,21 +59,47 @@ const Navbar = () => {
             Login
           </button>
         ) : (
-          <div className='relative group'>
-            <img src={assets.profiles} alt="profile" className='w-10 cursor-pointer' onClick={() => setShowDropdown((s) => !s)} />
-            <ul className={`${showDropdown ? 'block' : 'hidden'} group-hover:block absolute top-10 right-0 bg-black/50 backdrop-blur-md shadow border border-gray-700 py-2.5 w-48 rounded-md text-sm z-40 text-white`}>
-              <li onClick={() => { setShowDropdown(false); navigate('/my-bookings'); }} className='p-1.5 pl-3 hover:bg-gray-700 cursor-pointer'>
+          <div className="relative group">
+            <img
+              src={getProfileImage()}
+              alt="profile"
+              className="w-10 h-10 rounded-full object-cover cursor-pointer"
+              onClick={() => setShowDropdown((s) => !s)}
+            />
+            <ul
+              className={`${
+                showDropdown ? 'block' : 'hidden'
+              } group-hover:block absolute top-10 right-0 bg-black/50 backdrop-blur-md shadow border border-gray-700 py-2.5 w-48 rounded-md text-sm z-40 text-white`}
+            >
+              <li
+                onClick={() => { setShowDropdown(false); navigate('/my-bookings'); }}
+                className="p-1.5 pl-3 hover:bg-gray-700 cursor-pointer"
+              >
                 My Bookings
               </li>
+              <li
+                onClick={() => { setShowDropdown(false); navigate('/profile'); }}
+                className="p-1.5 pl-3 hover:bg-gray-700 cursor-pointer"
+              >
+                Profile
+              </li>
 
-              {/* Admin link shown only for admins */}
               {isAdmin && (
-                <li onClick={() => { setShowDropdown(false); navigate('/admin/add-shows'); }} className='p-1.5 pl-3 hover:bg-gray-700 cursor-pointer'>
+                <li
+                  onClick={() => {
+                    setShowDropdown(false);
+                    navigate('/admin/add-shows');
+                  }}
+                  className="p-1.5 pl-3 hover:bg-gray-700 cursor-pointer"
+                >
                   Admin
                 </li>
               )}
 
-              <li onClick={() => { setShowDropdown(false); logout(); }} className='p-1.5 pl-3 hover:bg-gray-700 cursor-pointer'>
+              <li
+                onClick={() => { setShowDropdown(false); logout(); }}
+                className="p-1.5 pl-3 hover:bg-gray-700 cursor-pointer"
+              >
                 Logout
               </li>
             </ul>
@@ -66,11 +107,15 @@ const Navbar = () => {
         )}
       </div>
 
-      <MenuIcon className="max-md:ml-4 md:hidden w-8 h-8 cursor-pointer" onClick={() => setIsOpen(!isOpen)} />
+      <MenuIcon
+        className="max-md:ml-4 md:hidden w-8 h-8 cursor-pointer"
+        onClick={() => setIsOpen(!isOpen)}
+      />
     </div>
   );
 };
 
 export default Navbar;
+
 
 

@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import timeFormat from '../lib/timeFormat';
 import { dateFormat } from '../lib/dateFormat';
 import isoTimeFormat from '../lib/isoTimeFormat';
 import { useAppContext } from '../context/AppContext.jsx';
-import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast'
+import Loading from '../components/loading.jsx';
 
 
 const MyBookings = () => {
@@ -104,9 +103,8 @@ const MyBookings = () => {
 
       )) : <p className='text-gray-400'>No bookings found.</p>}
     </div>
-  ) : (
-    <div>Loading...</div>
-  )
+  ) : <Loading />
+  
 }
 
 export default MyBookings
