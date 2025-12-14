@@ -203,7 +203,7 @@ const SeatLayout = () => {
 
             <button
               onClick={async () => {
-                if (!user) return toast.error('Please login to proceed')
+                if (!user) return navigate('/login')
                 if (!selectedSeats || !selectedSeats.length)
                   return toast.error('Please select time and seats')
 

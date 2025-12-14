@@ -60,7 +60,7 @@ const MovieDetails = () => {
 
   const toggleFavorite = async () => {
     if (!user) {
-      toast.error("Please login to add favorites");
+      navigate('/login');
       return;
     }
 
