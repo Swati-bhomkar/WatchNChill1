@@ -89,11 +89,11 @@ export const getAllShows = async (req, res) => {
 };
 
 /**
- * Return all bookings for admin (with populated movie, show, and user)
+ * Return all paid bookings for admin (with populated movie, show, and user)
  */
 export const getAllBookings = async (req, res) => {
   try {
-    const bookings = await Booking.find({})
+    const bookings = await Booking.find({ isPaid: true })
       .populate({
         path: "show",
         populate: { path: "movie" }
@@ -101,6 +101,84 @@ export const getAllBookings = async (req, res) => {
       .populate("user")
       .sort({ createdAt: -1 });
     return res.json({ success: true, bookings });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/**
+ * Delete a show by ID (admin only)
+ * Checks for existing bookings before deletion
+ */
+export const deleteShow = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if show exists
+    const show = await Show.findById(id);
+    if (!show) {
+      return res.status(404).json({ success: false, message: "Show not found" });
+    }
+
+    // Check for existing bookings
+    const existingBookings = await Booking.find({ show: id, isPaid: true });
+    if (existingBookings.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot delete show with existing bookings"
+      });
+    }
+
+    // Delete the show
+    await Show.findByIdAndDelete(id);
+
+    return res.json({ success: true, message: "Show deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/**
+ * Return all users with their booking stats (total bookings, last booking date)
+ */
+export const getAllUsers = async (req, res) => {
+  try {
+    // Aggregate booking stats per user
+    const userStats = await Booking.aggregate([
+      {
+        $match: { isPaid: true }
+      },
+      {
+        $group: {
+          _id: "$user",
+          totalBookings: { $sum: 1 },
+          lastBookingDate: { $max: "$createdAt" }
+        }
+      }
+    ]);
+
+    // Create a map for quick lookup
+    const statsMap = {};
+    userStats.forEach(stat => {
+      statsMap[stat._id.toString()] = {
+        totalBookings: stat.totalBookings,
+        lastBookingDate: stat.lastBookingDate
+      };
+    });
+
+    // Get all users
+    const users = await User.find({}).sort({ createdAt: -1 });
+
+    // Attach stats to users
+    const usersWithStats = users.map(user => ({
+      ...user.toObject(),
+      totalBookings: statsMap[user._id.toString()]?.totalBookings || 0,
+      lastBookingDate: statsMap[user._id.toString()]?.lastBookingDate || null
+    }));
+
+    return res.json({ success: true, users: usersWithStats });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: err.message });

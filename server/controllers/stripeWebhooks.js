@@ -8,6 +8,7 @@ import { sendBookingEmail } from '../utils/emails.js';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const stripeWebhooks = async (req, res) => {
+  console.log('🔔 Webhook received:', req.body);
   const sig = req.headers['stripe-signature'];
   let event;
 

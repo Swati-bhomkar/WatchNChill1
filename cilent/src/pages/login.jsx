@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const [state, setState] = useState('login');
@@ -55,11 +56,11 @@ const Login = () => {
           }
         }
       } else {
-        alert(result.message || 'Auth failed');
+        toast.error(result.message || 'Auth failed');
       }
     } catch (error) {
       console.error('Error:', error);
-      alert('Server error');
+      toast.error('Server error');
     }
   };
 

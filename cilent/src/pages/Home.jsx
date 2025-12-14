@@ -1,7 +1,4 @@
-import React from 'react'
 import HeroSection from '../components/HeroSection'
-import MovieCard from '../components/MovieCard'
-import { dummyShowsData } from '../assets/assets.js'
 import TrailersSection from '../components/TrailersSection.jsx'
 
 const Home = () => {

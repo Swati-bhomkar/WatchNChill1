@@ -2,6 +2,7 @@ import Show from '../models/Show.js';
 import Booking from '../models/Booking.js';
 import Stripe from 'stripe';
 
+
 const checkSeatsAvailability = async (showId , selectedSeats ) => {
   // implement real check: check Show.occupiedSeats and ensure none of selectedSeats are present
   const show = await Show.findById(showId)
@@ -75,7 +76,7 @@ export const createBooking = async (req , res) => {
     ]
 
     const session = await stripe.checkout.sessions.create({
-     success_url: `${origin}/my-bookings`,
+     success_url:`${origin}/loading/my-bookings`,
      cancel_url: `${origin}/my-bookings`,
      line_items,
      mode: 'payment',
@@ -156,4 +157,3 @@ export const cancelBooking = async (req, res) => {
     res.status(500).json({ success: false, message: error.message })
   }
 }
-

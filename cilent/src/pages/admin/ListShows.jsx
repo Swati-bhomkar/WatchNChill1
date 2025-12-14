@@ -12,7 +12,7 @@ const ListShows = () => {
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const getAllShows = async () => { 
+  const getAllShows = async () => {
     try {
       const { data } = await axios.get("/api/admin/shows");
       if (data.success) {
@@ -25,6 +25,25 @@ const ListShows = () => {
       toast.error("Error loading shows");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const deleteShow = async (showId) => {
+    if (!window.confirm("Are you sure you want to delete this show?")) {
+      return;
+    }
+
+    try {
+      const { data } = await axios.delete(`/api/admin/shows/${showId}`);
+      if (data.success) {
+        toast.success("Show deleted successfully");
+        getAllShows(); // Refresh the list
+      } else {
+        toast.error(data.message || "Failed to delete show");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error deleting show");
     }
   };
 
@@ -46,24 +65,22 @@ const ListShows = () => {
               <th className="p-2 font-medium">Show Time</th>
               <th className="p-2 font-medium">Total Bookings</th>
               <th className="p-2 font-medium">Earnings</th>
+              <th className="p-2 font-medium">Actions</th>
             </tr>
           </thead>
+
           <tbody className="text-sm font-light">
             {shows.length === 0 && (
               <tr>
-                <td colSpan="4" className="p-4 text-center text-gray-400">
+                <td colSpan="5" className="p-4 text-center text-gray-400">
                   No shows available
                 </td>
               </tr>
             )}
 
             {shows.map((show) => {
-              const totalBookings = show.occupiedSeats
-                ? Object.keys(show.occupiedSeats).length
-                : 0;
-
-              const earnings =
-                totalBookings * (show.showPrice || show.price || 0);
+              const totalBookings = show.totalBookings || 0;
+              const earnings = show.totalRevenue || 0;
 
               return (
                 <tr
@@ -73,10 +90,22 @@ const ListShows = () => {
                   <td className="p-2 min-w-[120px] pl-5">
                     {show.movie?.title || "—"}
                   </td>
+
                   <td className="p-2">{dateFormat(show.showDateTime)}</td>
+
                   <td className="p-2">{totalBookings}</td>
+
                   <td className="p-2">
                     {currency} {earnings}
+                  </td>
+
+                  <td className="p-2">
+                    <button
+                      onClick={() => deleteShow(show._id)}
+                      className= "bg-primary hover:bg-primary/90  text-white px-3 py-1 rounded  transition-colors"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               );

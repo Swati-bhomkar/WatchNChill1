@@ -1,7 +1,13 @@
 // src/pages/Theaters.jsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { theaters } from '../assets/assets'; // uses the theaters export
+import { theaters } from '../assets/assets';
+
+// 🔹 Function to generate Google Maps URL
+const getMapUrl = (name, address, city) => {
+  const query = `${name}, ${address}, ${city}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+};
 
 const Theaters = () => {
   const navigate = useNavigate();
@@ -30,7 +36,9 @@ const Theaters = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-lg font-semibold">{city.city}</h2>
-                  <p className="text-sm text-gray-400 mt-1">Top theaters in {city.city}</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Top theaters in {city.city}
+                  </p>
                 </div>
 
                 <button
@@ -43,13 +51,27 @@ const Theaters = () => {
 
               <ul className="mt-4 space-y-3">
                 {city.theaters.map((t, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      <div className="h-3 w-3 rounded-full bg-primary mt-1" />
+                  <li key={i} className="flex flex-col gap-2 border-b border-gray-800 pb-3 last:border-b-0">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-0.5">
+                        <div className="h-3 w-3 rounded-full bg-primary mt-1" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{t.name}</p>
+                        <p className="text-xs text-gray-400">{t.address}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-sm">{t.name}</p>
-                      <p className="text-xs text-gray-400">{t.address}</p>
+
+                    {/* 🔹 Button to open Google Maps */}
+                    <div className="pl-6">
+                      <a
+                        href={getMapUrl(t.name, t.address, city.city)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block text-xs bg-gray-800 px-3 py-1 rounded-full hover:bg-gray-700 transition"
+                      >
+                        View on Google Maps
+                      </a>
                     </div>
                   </li>
                 ))}

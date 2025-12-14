@@ -13,6 +13,7 @@ import Favorite from './pages/Favorite';
 import Login from './pages/login';
 import About from './pages/About';
 import Theaters from './pages/Theaters';
+import Loading from './components/loading';
 
 
 // admin pages
@@ -21,6 +22,7 @@ import Dashboard from './pages/admin/Dashboard';
 import AddShows from './pages/admin/AddShows';
 import ListShows from './pages/admin/ListShows';
 import ListBookings from './pages/admin/ListBookings';
+import ListUsers from './pages/admin/ListUsers';
 import AddShowForm from './pages/admin/AddShowForm';
 import AdminRoute from "./components/admin/AdminRoute";
 import Profile from './pages/profile';
@@ -43,6 +45,7 @@ const App = () => {
         <Route path="/movies/:id/:date" element={<SeatLayout />} />
         <Route path="/about" element={<About />} />
         <Route path="/theaters" element={<Theaters/>} />
+        <Route path="/loading/:nextUrl" element={<Loading />} />
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/favorite" element={<Favorite />} />
         <Route path="/login" element={<Login />} />
@@ -60,6 +63,7 @@ const App = () => {
           <Route path="add-shows/form" element={<AddShowForm />} />
           <Route path="list-shows" element={<ListShows />} />
           <Route path="list-bookings" element={<ListBookings />} />
+          <Route path="list-users" element={<ListUsers />} />
         </Route>
 
 
@@ -70,5 +74,3 @@ const App = () => {
 };
 
 export default App;
-
-
