@@ -60,16 +60,15 @@ const SeatLayout = () => {
             <button
               key={seatId}
               onClick={() => handleSeatClick(seatId)}
-              disabled={isOccupied}
-              className={`
-                h-8 w-8 rounded border border-primary/60
-                ${isSelected ? 'bg-primary text-white' : 'bg-transparent'}
-                ${
-                  isOccupied
-                    ? 'bg-gray-500/60 text-white cursor-not-allowed'
-                    : 'cursor-pointer'
+              className={`h-8 w-8 rounded border border-primary/60
+                ${isOccupied
+                  ? 'bg-gray-600 text-white cursor-not-allowed'
+                  : isSelected
+                    ? 'bg-primary text-white'
+                    : 'bg-transparent hover:bg-primary/20 cursor-pointer'
                 }
               `}
+
             >
               {seatId}
             </button>
@@ -124,11 +123,10 @@ const SeatLayout = () => {
                     time: showItem.showDateTime,
                   })
                 }
-                className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${
-                  selectedTime?.time === showItem.showDateTime
-                    ? 'bg-primary text-white'
-                    : 'hover:bg-primary/20'
-                }`}
+                className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${selectedTime?.time === showItem.showDateTime
+                  ? 'bg-primary text-white'
+                  : 'hover:bg-primary/20'
+                  }`}
               >
                 <ClockIcon className="w-4 h-4" />
                 <p className="text-sm">
