@@ -43,7 +43,7 @@ const ListShows = () => {
       }
     } catch (error) {
       console.error(error);
-      toast.error("Error deleting show");
+      toast.error(error.response?.data?.message || "Error deleting show");
     }
   };
 
